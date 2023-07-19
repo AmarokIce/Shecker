@@ -1,0 +1,27 @@
+modLoader="javafml" #mandatory
+loaderVersion="[40,)"
+license="Pineapple"
+
+[[mods]]
+modId="shaker"
+version="${file.jarVersion}"
+displayName=""
+logoFile=""
+credits="someoneice"
+authors="someoneice"
+description='''
+'''
+
+[[dependencies.shaker]]
+    modId="forge"
+    mandatory=true
+    versionRange="[40,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.shaker]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"
