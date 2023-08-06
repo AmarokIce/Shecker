@@ -29,6 +29,29 @@ public class RecipeShaker implements Recipe<SimpleContainer> {
         this.shaking = shaking;
     }
 
+    /**
+     * 匹配器，用于匹配食谱是否满足要求。在对应的检查点使用以下代码呼叫这段代码：
+     * 
+     * ```java
+        SimpleContainer container = new SimpleContainer(8);
+        item.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(it -> {
+            for (int i = 0; i < 8; i ++) container.addItem(it.getStackInSlot(i).copy());
+        });
+
+        Optional<RecipeShaker> match = world.getRecipeManager().getRecipeFor(RecipeShaker.Type.INSTANCE, container, world);
+        match.ifPresent(it -> {
+            if (tag.getInt("shake_count") > it.getShaking()) item.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itm -> {
+                for (int i = 0; i < 8; i ++)
+                    itm.extractItem(i, 1, false);
+                itm.insertItem(8, it.getResultItem().copy(), false);
+            });
+        });
+     * ```
+     * 
+     * @param container 存储器，在上述代码中取得对象，然后塞进一个新的container中发过来。
+     * @param world 世界对象，用于访问世界合成表管理器（RecipeManager），对于全局的食谱无需使用。
+     * @return Boolean值用于判断是否存在对应的食谱映射。
+     */
     @Override
     public boolean matches(SimpleContainer container, Level world) {
         List<Integer> list = Lists.newArrayList();
@@ -49,6 +72,9 @@ public class RecipeShaker implements Recipe<SimpleContainer> {
         return true;
     }
 
+    /**
+     * 装配食谱，可以考虑与 #matches 配合使用。
+     */
     @Override
     public ItemStack assemble(SimpleContainer p_44001_) {
         return null;
@@ -74,9 +100,12 @@ public class RecipeShaker implements Recipe<SimpleContainer> {
         return this.id;
     }
 
+    /**
+     * 别忘记这个！如果这个为空，会在服务器中无法揽收远端发包的食谱！
+     */
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return null;
+        return ShakerMain.SHAKER_RECIPE.get();
     }
 
     @Override
@@ -93,6 +122,9 @@ public class RecipeShaker implements Recipe<SimpleContainer> {
         public static final Type INSTANCE = new Type();
     }
 
+    /**
+     * 串行器，通过网路或本地得到Json对象并解析。相关实现见Gson的JsonObject实现。注意，这些不是Gson对象的解析器，而是JsonObject对象实例。
+     */
     public static class Serializer implements RecipeSerializer<RecipeShaker> {
         public static final Serializer INSTANCE = new Serializer();
         public static final ResourceLocation ID = new ResourceLocation(ShakerMain.MODID, RecipeShaker.NAME);
@@ -102,6 +134,9 @@ public class RecipeShaker implements Recipe<SimpleContainer> {
             ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
             int shaking = GsonHelper.getAsInt(json, "shake_count");
 
+            /**
+             * 使用Ingredient对象缓存Json中的Tag标记或Item标记，最终会打包成一套Nonnulllist<ItemStack>。
+             */
             JsonArray ingredients = GsonHelper.getAsJsonArray(json, "ingredients");
             NonNullList<Ingredient> inputs = NonNullList.withSize(ingredients.size(), Ingredient.EMPTY);
 

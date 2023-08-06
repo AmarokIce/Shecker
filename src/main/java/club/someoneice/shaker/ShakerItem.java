@@ -3,6 +3,7 @@ package club.someoneice.shaker;
 import club.someoneice.shaker.gui.ContainerShaker;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -28,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ShakerItem extends Item {
     public ShakerItem() {
@@ -48,6 +50,7 @@ public class ShakerItem extends Item {
             return InteractionResultHolder.sidedSuccess(item, world.isClientSide);
         } else {
             tag.putInt("shake_count", tag.getInt("shake_count") + 1);
+            player.sendMessage(new TextComponent("Shaking times: " + tag.getInt("shake_count")), UUID.randomUUID());
             world.playSound(null, player.position().x, player.position().y, player.position().z, SoundEvents.HONEY_DRINK, SoundSource.PLAYERS, 0.5F, 2.6F + world.random.nextFloat() * 0.8F);
             return InteractionResultHolder.success(item);
         }
